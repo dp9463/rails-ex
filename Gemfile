@@ -58,3 +58,4 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'zipkin-tracer', '=0.32.4'
+gem 'stacktracer', '=19.12.00'
