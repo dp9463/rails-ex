@@ -144,10 +144,7 @@
               "secret": "${GITHUB_WEBHOOK_SECRET}"
             }
           }
-        ],
-        "postCommit": {
-          "script": "bundle exec rake test"
-        }
+        ]
       }
     },
     {
