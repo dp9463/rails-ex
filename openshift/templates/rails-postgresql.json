@@ -543,7 +543,7 @@
       "displayName": "Rails Environment",
       "required": true,
       "description": "Environment under which the sample application will run. Could be set to production, development or test.",
-      "value": "development"
+      "value": "production"
     },
     {
       "name": "DATABASE_SERVICE_NAME",
