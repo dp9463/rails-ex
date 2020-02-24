@@ -198,9 +198,9 @@
           "spec": {
             "volumes": [{
               "name": "global-environment",
-              "secret": [{
+              "secret": {
                 "secretName": "icam-server-secret"
-              }]
+              }
             }],
             "containers": [{
               "name": "${NAME}",
