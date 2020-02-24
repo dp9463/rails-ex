@@ -109,13 +109,20 @@
               "namespace": "${NAMESPACE}",
               "name": "ruby:2.5"
             },
-            "env": 
-              - name: "RUBYGEM_MIRROR",
-                value: "${RUBYGEM_MIRROR}"
-              - name: "DISABLE_ASSET_COMPILATION",
-                value: "true"
-              - name: "BUILD_LOGLEVEL"
-                value: "2"
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR",
+                "value": "${RUBYGEM_MIRROR}"
+              },
+	      {
+                "name": "DISABLE_ASSET_COMPILATION",
+                "value": "true"
+	      },
+              {
+                "name": "BUILD_LOGLEVEL",
+                "value": "2"
+              }
+            ]
           }
         },
         "output": {
