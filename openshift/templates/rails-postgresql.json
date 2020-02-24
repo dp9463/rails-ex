@@ -113,7 +113,11 @@
               {
                 "name": "RUBYGEM_MIRROR",
                 "value": "${RUBYGEM_MIRROR}"
-              }
+              },
+	      {
+                "name": "DISABLE_ASSET_COMPILATION",
+                "value": "true"
+	      }
             ]
           }
         },
