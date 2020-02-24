@@ -120,7 +120,7 @@
 	      },
               {
                 "name": "BUILD_LOGLEVEL",
-                "value": "5"
+                "value": "2"
               }
             ]
           }
@@ -539,8 +539,8 @@
       "name": "RAILS_ENV",
       "displayName": "Rails Environment",
       "required": true,
-      "description": "Environment under which the sample application will run. Could be set to production, development or test.",
-      "value": "production"
+      "description": "Environment under which the sample application will run. Could be set to roduction, development or test.",
+      "value": "development"
     },
     {
       "name": "DATABASE_SERVICE_NAME",
