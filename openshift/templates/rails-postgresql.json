@@ -120,7 +120,7 @@
 	      },
               {
                 "name": "BUILD_LOGLEVEL",
-                "value": "2"
+                "value": "5"
               }
             ]
           }
