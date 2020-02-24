@@ -17,22 +17,21 @@
   },
   "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/rails-ex/blob/master/README.md.",
   "labels": {
-      "template": "rails-postgresql-example",
-      "app": "rails-postgresql-example"
+    "template": "rails-postgresql-example",
+    "app": "rails-postgresql-example"
   },
-  "objects": [
-    {
+  "objects": [{
       "kind": "Secret",
       "apiVersion": "v1",
       "metadata": {
         "name": "${NAME}"
       },
-      "stringData" : {
-        "database-user" : "${DATABASE_USER}",
-        "database-password" : "${DATABASE_PASSWORD}",
-        "application-user" : "${APPLICATION_USER}",
-        "application-password" : "${APPLICATION_PASSWORD}",
-        "keybase" : "${SECRET_KEY_BASE}"
+      "stringData": {
+        "database-user": "${DATABASE_USER}",
+        "database-password": "${DATABASE_PASSWORD}",
+        "application-user": "${APPLICATION_USER}",
+        "application-password": "${APPLICATION_PASSWORD}",
+        "keybase": "${SECRET_KEY_BASE}"
       }
     },
     {
@@ -46,13 +45,11 @@
         }
       },
       "spec": {
-        "ports": [
-          {
-            "name": "web",
-            "port": 8080,
-            "targetPort": 8080
-          }
-        ],
+        "ports": [{
+          "name": "web",
+          "port": 8080,
+          "targetPort": 8080
+        }],
         "selector": {
           "name": "${NAME}"
         }
@@ -109,15 +106,14 @@
               "namespace": "${NAMESPACE}",
               "name": "ruby:2.5"
             },
-            "env": [
-              {
+            "env": [{
                 "name": "RUBYGEM_MIRROR",
                 "value": "${RUBYGEM_MIRROR}"
               },
-	      {
+              {
                 "name": "DISABLE_ASSET_COMPILATION",
                 "value": "true"
-	      },
+              },
               {
                 "name": "BUILD_LOGLEVEL",
                 "value": "2"
@@ -131,8 +127,7 @@
             "name": "${NAME}:latest"
           }
         },
-        "triggers": [
-          {
+        "triggers": [{
             "type": "ImageChange"
           },
           {
@@ -172,8 +167,7 @@
             }
           }
         },
-        "triggers": [
-          {
+        "triggers": [{
             "type": "ImageChange",
             "imageChangeParams": {
               "automatic": true,
@@ -202,109 +196,126 @@
             }
           },
           "spec": {
-            "containers": [
-              {
-                "name": "${NAME}",
-                "image": " ",
-                "ports": [
-                  {
-                    "containerPort": 8080
-                  }
-                ],
-                "readinessProbe": {
-                  "timeoutSeconds": 3,
-                  "initialDelaySeconds": 5,
-                  "httpGet": {
-                    "path": "/articles",
-                    "port": 8080
+            "volumes": [{
+              "name": "global-environment",
+              "secret": [{
+                "secretName": "icam-server-secret"
+              }]
+            }],
+            "containers": [{
+              "name": "${NAME}",
+              "image": " ",
+              "ports": [{
+                "containerPort": 8080
+              }],
+              "readinessProbe": {
+                "timeoutSeconds": 3,
+                "initialDelaySeconds": 5,
+                "httpGet": {
+                  "path": "/articles",
+                  "port": 8080
+                }
+              },
+              "livenessProbe": {
+                "timeoutSeconds": 3,
+                "initialDelaySeconds": 10,
+                "httpGet": {
+                  "path": "/articles",
+                  "port": 8080
+                }
+              },
+              "volumeMounts": [{
+                "name": "global-environment",
+                "mountPath": "/opt/ibm/apm/serverconfig"
+              }],
+              "env": [{
+                  "name": "DATABASE_SERVICE_NAME",
+                  "value": "${DATABASE_SERVICE_NAME}"
+                },
+                {
+                  "name": "OPENTRACING_SAMPLER_PARAM",
+                  "value": "1"
+                },
+                {
+                  "name": "LATENCY_SAMPLER_PARAM",
+                  "value": "1"
+                },
+                {
+                  "name": "RESOURCE_MONITORING_LOG_LEVEL",
+                  "value": "DEBUG"
+                },
+                {
+                  "name": "POSTGRESQL_USER",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "database-user"
+                    }
                   }
                 },
-                "livenessProbe": {
-                  "timeoutSeconds": 3,
-                  "initialDelaySeconds": 10,
-                  "httpGet": {
-                    "path": "/articles",
-                    "port": 8080
+                {
+                  "name": "POSTGRESQL_PASSWORD",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "database-password"
+                    }
                   }
                 },
-                "env": [
-                  {
-                    "name": "DATABASE_SERVICE_NAME",
-                    "value": "${DATABASE_SERVICE_NAME}"
-                  },
-                  {
-                    "name": "POSTGRESQL_USER",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "database-user"
-                      }
+                {
+                  "name": "POSTGRESQL_DATABASE",
+                  "value": "${DATABASE_NAME}"
+                },
+                {
+                  "name": "SECRET_KEY_BASE",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "keybase"
                     }
-                  },
-                  {
-                    "name": "POSTGRESQL_PASSWORD",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "database-password"
-                      }
-                    }
-                  },
-                  {
-                    "name": "POSTGRESQL_DATABASE",
-                    "value": "${DATABASE_NAME}"
-                  },
-                  {
-                    "name": "SECRET_KEY_BASE",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "keybase"
-                      }
-                    }
-                  },
-                  {
-                    "name": "POSTGRESQL_MAX_CONNECTIONS",
-                    "value": "${POSTGRESQL_MAX_CONNECTIONS}"
-                  },
-                  {
-                    "name": "POSTGRESQL_SHARED_BUFFERS",
-                    "value": "${POSTGRESQL_SHARED_BUFFERS}"
-                  },
-                  {
-                    "name": "APPLICATION_DOMAIN",
-                    "value": "${APPLICATION_DOMAIN}"
-                  },
-                  {
-                    "name": "APPLICATION_USER",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "application-user"
-                      }
-                    }
-                  },
-                  {
-                    "name": "APPLICATION_PASSWORD",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "application-password"
-                      }
-                    }
-                  },
-                  {
-                    "name": "RAILS_ENV",
-                    "value": "${RAILS_ENV}"
                   }
-                ],
-                "resources": {
-                  "limits": {
-                    "memory": "${MEMORY_LIMIT}"
+                },
+                {
+                  "name": "POSTGRESQL_MAX_CONNECTIONS",
+                  "value": "${POSTGRESQL_MAX_CONNECTIONS}"
+                },
+                {
+                  "name": "POSTGRESQL_SHARED_BUFFERS",
+                  "value": "${POSTGRESQL_SHARED_BUFFERS}"
+                },
+                {
+                  "name": "APPLICATION_DOMAIN",
+                  "value": "${APPLICATION_DOMAIN}"
+                },
+                {
+                  "name": "APPLICATION_USER",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "application-user"
+                    }
                   }
+                },
+                {
+                  "name": "APPLICATION_PASSWORD",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "application-password"
+                    }
+                  }
+                },
+                {
+                  "name": "RAILS_ENV",
+                  "value": "${RAILS_ENV}"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "memory": "${MEMORY_LIMIT}"
                 }
               }
-            ]
+            }]
           }
         }
       }
@@ -319,13 +330,11 @@
         }
       },
       "spec": {
-        "ports": [
-          {
-            "name": "postgresql",
-            "port": 5432,
-            "targetPort": 5432
-          }
-        ],
+        "ports": [{
+          "name": "postgresql",
+          "port": 5432,
+          "targetPort": 5432
+        }],
         "selector": {
           "name": "${DATABASE_SERVICE_NAME}"
         }
@@ -345,8 +354,7 @@
         "strategy": {
           "type": "Recreate"
         },
-        "triggers": [
-          {
+        "triggers": [{
             "type": "ImageChange",
             "imageChangeParams": {
               "automatic": true,
@@ -376,87 +384,77 @@
             }
           },
           "spec": {
-            "volumes": [
-              {
+            "volumes": [{
+              "name": "data",
+              "emptyDir": {}
+            }],
+            "containers": [{
+              "name": "postgresql",
+              "image": " ",
+              "ports": [{
+                "containerPort": 5432
+              }],
+              "readinessProbe": {
+                "timeoutSeconds": 1,
+                "initialDelaySeconds": 5,
+                "exec": {
+                  "command": ["/usr/libexec/check-container"]
+                }
+              },
+              "livenessProbe": {
+                "timeoutSeconds": 10,
+                "initialDelaySeconds": 120,
+                "exec": {
+                  "command": ["/usr/libexec/check-container", "--live"]
+                }
+              },
+              "volumeMounts": [{
                 "name": "data",
-                "emptyDir": {}
-              }
-            ],
-            "containers": [
-              {
-                "name": "postgresql",
-                "image": " ",
-                "ports": [
-                  {
-                    "containerPort": 5432
-                  }
-                ],
-                "readinessProbe": {
-                  "timeoutSeconds": 1,
-                  "initialDelaySeconds": 5,
-                  "exec": {
-                    "command": [ "/usr/libexec/check-container" ]
+                "mountPath": "/var/lib/pgsql/data"
+              }],
+              "env": [{
+                  "name": "POSTGRESQL_USER",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "database-user"
+                    }
                   }
                 },
-                "livenessProbe": {
-                  "timeoutSeconds": 10,
-                  "initialDelaySeconds": 120,
-                  "exec": {
-                    "command": [ "/usr/libexec/check-container", "--live" ]
+                {
+                  "name": "POSTGRESQL_PASSWORD",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "name": "${NAME}",
+                      "key": "database-password"
+                    }
                   }
                 },
-                "volumeMounts": [
-                  {
-                    "name": "data",
-                    "mountPath": "/var/lib/pgsql/data"
-                  }
-                ],
-                "env": [
-                  {
-                    "name": "POSTGRESQL_USER",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "database-user"
-                      }
-                    }
-                  },
-                  {
-                    "name": "POSTGRESQL_PASSWORD",
-                    "valueFrom": {
-                      "secretKeyRef" : {
-                        "name" : "${NAME}",
-                        "key" : "database-password"
-                      }
-                    }
-                  },
-                  {
-                    "name": "POSTGRESQL_DATABASE",
-                    "value": "${DATABASE_NAME}"
-                  },
-                  {
-                    "name": "POSTGRESQL_MAX_CONNECTIONS",
-                    "value": "${POSTGRESQL_MAX_CONNECTIONS}"
-                  },
-                  {
-                    "name": "POSTGRESQL_SHARED_BUFFERS",
-                    "value": "${POSTGRESQL_SHARED_BUFFERS}"
-                  }
-                ],
-                "resources": {
-                  "limits": {
-                    "memory": "${MEMORY_POSTGRESQL_LIMIT}"
-                  }
+                {
+                  "name": "POSTGRESQL_DATABASE",
+                  "value": "${DATABASE_NAME}"
+                },
+                {
+                  "name": "POSTGRESQL_MAX_CONNECTIONS",
+                  "value": "${POSTGRESQL_MAX_CONNECTIONS}"
+                },
+                {
+                  "name": "POSTGRESQL_SHARED_BUFFERS",
+                  "value": "${POSTGRESQL_SHARED_BUFFERS}"
+                }
+              ],
+              "resources": {
+                "limits": {
+                  "memory": "${MEMORY_POSTGRESQL_LIMIT}"
                 }
               }
-            ]
+            }]
           }
         }
       }
     }
   ],
-  "parameters": [
-    {
+  "parameters": [{
       "name": "NAME",
       "displayName": "Name",
       "description": "The name assigned to all of the frontend objects defined in this template.",
